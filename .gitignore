@@ -1,0 +1,42 @@
+# Compiled binaries
+*.out
+*.exe
+*.app
+
+
+# Object files
+*.oode/
+.idea/
+*.swp
+*.swo
+
+
+# OS files
+.DS_Store
+Thumbs.db
+
+
+# Logs
+*.log
+
+
+# Temporary files
+*.tmp
+*.temp
+*.obj
+
+
+# Bison/Flex generated files
+lex.yy.c
+y.tab.c
+y.tab.h
+*.tab.c
+*.tab.h
+
+# Build folders
+/build/
+/bin/
+
+
+# IDE / Editor files
+.vsc

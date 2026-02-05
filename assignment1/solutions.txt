@@ -1,0 +1,39 @@
+Components of the group: 
+	- Rafael Pino Rodriguez
+	- Pablo Romero Del Amo
+
+	
+ASSIGNMENT 1:
+
+
+#1:
+	segmention fault in ack.cpp line 255:
+   		Added a condition to initialize a null pointer at line 6.
+
+#2.1 & 2.2:
+	lexical analysis (scanner)  --> lexan()
+	syntactic analysis (parser) --> parser(), list(), expr(), match(),  etc
+	semantic analysis --> not present, but not necessary because we only work with integers.
+	intermediate code generator -->  emit()
+	machine code --> not present
+	optimizers --> not present
+
+
+2.3:
+	semantic analysis: the code does not check types, initialization, or other semantic errors.
+	code machine generation and	optimizators it also not implemented
+
+2.4:
+	1. Implement a value stack to push and pop intermediate values in parser.c.
+	2. Modify the emit() function to perform arithmetic calculations instead of only printing postfix.
+	3. Add appropriate print statements to show the results after evaluating each expression.
+	
+3.1 & 3.2
+
+	#define FACTORIAL(x) ((x) == 0 ? 1 : (x) * (FACTORIAL((x)-1)))
+
+	No, this won't work because is not supported in C, the preprocessor cannot call itself indefinitely and in preprocessing we can't make calculations.  
+
+3.3
+	To make the macro actually work, the preprocessor would need to be able to do calculations instead of just replacing text.
+	Right now it only substitutes variables and code, but it can’t evaluate expressions or stop expanding when a condition is met.

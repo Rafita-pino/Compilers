@@ -1,0 +1,101 @@
+Author:
+    - Rafael Pino Rodriguez
+
+Date:
+    10/12/2025
+
+
+
+The dangling else ambiguity was resolved by restructuring the block_list and block rules into statement and else, explicitly 
+requiring {} blocks.
+These changes removed the 33 shift/reduce and 11 reduce/reduce conflicts from the parser.
+I also added the non-terminal r to distinguish between ID and NUM in PRINT statements, removing the previous ambiguity.
+
+
+block_list:
+    statement block_list    { $$ = ($2) ? mknode(';', $1, NONE, $2) : $1;  }
+    | /* empty */   { $$ = NONE; }
+    ;
+
+statement:
+    '{' block_list '}'                               { $$ = $2;  }
+    | WHILE '(' expr ')' '{' block_list '}'                  { $$ = mknode(WHILE, $3, NONE, $6);    }
+    | IF '(' expr ')' '{' block_list '}'  else                { $$ = ($6) ? mknode(IF, $3, $6, $8) : mknode(IF, $3, $6, NONE);    }
+    | PRINT '(' r ')' ';'                           { $$ = mknode(PRINT, $3, NONE, NONE);  }
+    | READ '(' ID ')' ';'                           { $$ = mknode(READ, mkleaf(ID, $3), NONE, NONE);   }
+    | expr ';'                                      { $$ = $1; }
+    ;
+
+r:
+    ID                                              { $$ = mkleaf(ID, $1);  }
+    | NUM                                           { $$ = mkleaf(NUM, $1); }
+    ;
+
+else:
+    ELSE '{' block_list '}'                           { $$ = $3;  }
+    | /*empty*/                                     { $$ = NONE;    }
+    ;
+
+To implement the execution part I added in syntaxTree.c the function int execute(TreeNode *p), this calls the functions recursively 
+on the children of each node in the syntax tree, evaluating expressions, executing statements, and handling control structures like 
+if and while.
+
+To test the program I create the next code:
+
+read(a);
+read(b);
+c = 0;
+d = 1;
+while (a > 0) {
+    if (b % 2 < 1) {   
+        c = c + a * 2;
+    } else {
+        c = c + a;
+    }
+    d = d * b;
+    a = a - 1;
+}
+print(c);
+print(d);
+done
+
+the results with: 
+    a = 3
+    b = 4
+are c = 12 and d = 64, with final result 64 because it is the last instruction executed.
+
+I received guidance from ChatGPT only on conceptual aspects, such as recursive execution of the syntax tree and handling control structures. 
+I also received help from ChatGPT to correct the text.
+
+*****************************************************************************************************************************************
+*****************************************************************************************************************************************
+*****************************************************************************************************************************************
+
+VERSION 2.0:
+I added the two missing operators, MOD and DIV, to syntaxTree.c. I created a simple test to make sure it works:
+i = 1000;
+while (i>0){
+if ((i mod 100) < 1){
+print(i);
+}
+i = i - 1;
+}
+done
+
+*****************************************************************************************************************************************
+*****************************************************************************************************************************************
+*****************************************************************************************************************************************
+
+VERSION 3.0:
+I changed line 42 in calculator.y to print the else even if the if statement is empty:  
+| IF '(' expr ')' '{' block_list '}'  else                { $$ = mknode(IF, $3, $6, $8);    }
+
+I also modify the previous code to make sure it works:
+read(i);
+while (i>0){
+if((i mod 100) < 1){}else{
+print(i);
+}
+i = i - 1;
+}
+done

@@ -1,0 +1,118 @@
+Author:
+    - Rafael Pino Rodriguez
+
+Date:
+    22/10/2025
+
+Part A:
+    For this part, I had to modify the following files:
+
+    calculator.y:
+        I completely rewrote the .y file to simplify the grammar and make it build a syntaxTree. The original version was made to 
+        implement emit() functions but this one, was made to make a syntaxTree with node pointers.
+        I implement the new constructors mknode(type, a1, a2, a3) and mkleaf(type, value).
+        The only grammar rules that use mkleaf() are the terminal rules ID && NUM. while all non-terminal rules use mknode(). 
+        Each rule returns TreeNode*, except for the start rule, whiche returns the first pointer to the full tree (root).
+
+    global.h:
+        I added the definition of TreeNode, which is a struct. 
+        I also changed the variable NONE to the NULL pointer. 
+        In this file, I also defined the functions to create nodes and leaves.
+
+            typedef struct TreeNode {
+                int type; /* type of node */
+                int leaf_value; /* value of node if leaf */
+                struct TreeNode *children[MAX_ARGS]; /* pointers to children */
+            }TreeNode;
+
+            extern TreeNode* mkleaf(int type, int value); /* create a leaf node */
+            extern TreeNode* mknode(int type, TreeNode* c1, TreeNode* c2, TreeNode* c3); /* create a node with up to three children */
+
+    makefile:
+        I modified the makefile to include the new files and remove the emiter.* files.
+
+        syntaxTree.o: 	syntaxTree.c global.h
+	        gcc $(CFLAGS) -c syntaxTree.c	
+
+    New files created:
+    syntaxTree.c:
+        This file includes the definitions of the necessary functions to make nodes and leaves, and therefore to build the syntaxTree.
+
+        /*syntaxTree.c*/
+
+            #define MAX_ARGS 3
+            #include "global.h"
+
+            TreeNode* mkleaf(int type, int value){ 
+                TreeNode* p = (TreeNode*) malloc(sizeof(TreeNode));
+                p->type = type;
+                p->leaf_value = value;
+                for(int i=0;i<MAX_ARGS;i++){
+                    p->children[i] = NONE;
+                }
+                
+                return p;
+            }
+
+            TreeNode* mknode(int type, TreeNode* left, TreeNode* middle, TreeNode* right){
+                TreeNode* p = (TreeNode*) malloc(sizeof(TreeNode));
+                p->type = type;
+                p->children[0] = left;
+                p->children[1] = middle;
+                p->children[2] = right;
+                return p;
+            }
+
+    I would like to mention that I had some difficulties compiling the project because I forgot to put the keyword "struct" before TreeNode in
+    the %union section. That caused the following error: unknown type name ‘TreeNode’.
+
+    And I also had additional difficulties building the tree, because with the old grammar it was constructed in the wrong order, 
+    so I decided to start over.
+        
+
+Part B:
+    In this part, I used the same base code that is on the web. I added the function pintree(root) at the end of the start rule (in .y file), to 
+    call it when the tree is finally built.
+    I implemented a switch case for leaves (ID or NUM), one for nodes with two children and one for the conditional '?' rule (three children).
+
+
+
+Part C:
+    First, I modified the lex.l file to handle the new keywords:
+
+        "while" {return WHILE;}
+        "if"    {return IF;   }
+        "else"  {return ELSE; }
+        "read"  {return READ; }
+        "print" {return PRINT;}
+
+        "{" {return '{';  }
+        "}" {return '}';  }
+    The last two rules ({ and }) are not strictly necessary, because we already have: .   { return yytext[0]; } at the end of the file.
+   
+    Second, I modified the .y file to add the new statements. Since they have the lowest priority, I changed the last "list" rule to "block_list"
+    and I created a new one "block" to handle the new statements.
+
+    Finally, I modified the tree printer, adding the new possible cases to be printed. 
+
+
+FOR TEST THE PROJECT, COPY AND PAST THIS CODE IN THE TERMINAL:
+
+if(10 mod 50 < 23){
+    read(i);
+    while ( i > 0 ){
+        i = i - 1;
+        x = x ^ i;
+    }
+} else{
+    print(x);
+}
+done
+
+
+Sources:
+In this part, I used ChatGPT to review the code, help me solve issues in the .y file, and confirm that the syntax tree printer 
+correctly the solution.
+
+https://www.lysator.liu.se/~padrone/temporary/koi/2025/linux-labbar/lab-5/build-hints.html
+https://www.lysator.liu.se/~padrone/temporary/koi/2025/linux-labbar/lab-5/print-hints.html

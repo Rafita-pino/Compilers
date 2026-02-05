@@ -1,0 +1,35 @@
+Author:
+    - Rafael Pino Rodriguez
+
+Date:
+    17/10/2025
+
+Part A:
+I implemented a simple DFA in "dfa.c" using a switch case for handle state transitions.
+The program have 4 states, 2 of them are final states (3 && 4). 
+State 4 is for invalids inputs (!=a || != b) and state 3 is the normal final state.
+State 1 is the initial state and state 2 is intermediate state. 
+
+The program’s final sequence is displayed because it is stored in a char array as extra.
+
+
+Part B:
+The new scanner is implemented in the file lex.l and performs the same functionality as the old one (lexer.c), but using Flex.
+The new lexer recognize:
+- Numbers (NUM), as [0-9]+ (one or more).
+- Identifiers (ID), using [A-Za-z][A-Za-z0-9]* starts with one letter and 0 or more nums/letters.
+- Operators and reserved words, such as +, -, *, /, div, mod, =, <, >, &, |, ?, : which just return the symbol.
+- Any other character, which is returned directly to the parser (return yytext[0];), it works for '(' ')' for example.
+
+Finally, the Makefile was updated to generate and compile the Flex output file (lex.yy.c):
+    
+    lex.yy.o:	lex.l calculator.tab.h global.h
+        flex -o lex.yy.c lex.l 
+        gcc $(CFLAGS) -c lex.yy.c -o lex.yy.o
+also the line with all object files.
+
+Sources:
+For this assignment, I used ChatGPT as a technical assistant. It was very helpful to understanding the structure of .l files and for fixing build errors with global variables
+such as lineno or token_value.
+
+https://www.lysator.liu.se/~padrone/temporary/koi/2025/lectures/lecture-06/index.html

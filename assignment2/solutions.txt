@@ -1,0 +1,154 @@
+Author:
+    - Rafael Pino Rodriguez
+
+Part A:
+
+    start -> list eof
+    list -> input ; list
+        | empty
+
+    input -> expr
+        | assignment
+
+    assignment -> id { print(id.lexeme) } = expr { print('=') }
+    expr -> term moreterms
+    moreterms -> + term { print('+') } moreterms
+        | - term { print('-') } moreterms
+        | empty
+    term -> factor morefactors
+    morefactors -> * factor { print('*') } morefactors
+        | / factor { print('/') } morefactors
+        | div factor { print('DIV') } morefactors
+        | mod factor { print('MOD') } morefactors
+        | empty
+    factor -> ( expr )
+        | id { print(id.lexeme) }
+        | num { print(num.value) }
+
+//To handle both forms, I added a new non-terminal called input, which can be an expression or assignment.
+//And I changed the definition of list to a list of inputs
+
+//No, it is not possible to write a predictive recursive-descent parser with only one token lookahead. 
+//The grammar is not ambiguous, because if id is followed by '=',it is an assignment otherwise, it is an expression.
+//Left-recursive is not the problem either, because I used terms/moreterms.
+//The problem is in the FIRST sets, wich are not disjoint, so we cannot implement an LL(1). We could implement an LL(2).
+
+Part B:
+ I modificated this files: 
+    - parser.c --> 
+        list()
+            void list()
+            {
+                if (lookahead == ID || lookahead == NUM) {
+                   assignment(); match(';'); list(); /*added assignment()*/
+                }
+                else {
+                    /* Empty */
+                }
+            }
+
+        assignment()
+            void assignment()
+            {
+                if (lookahead == ID) {
+                    int id_number = token_value;
+                    match(ID);
+                    emit(ID, id_number);
+                    match('=');
+                    expr();
+                    emit('=', token_value);
+
+                }
+                else
+                    error("syntax error in assignment");
+            }
+            /*this new function can generate the correct output for the program*/
+    
+    -emitter.c -->
+        /*added this new case for generate the output '=' */
+            case '=':
+                printf("=\n"); break;
+
+Part C:
+    To enable calulations in 2.9 program, I modificated the next files:
+    global.h -->
+        Added to symbol table an int value to save the valor of the variable.:
+
+            struct symentry {  /*  form of symbol table entry  */
+                char *lexeme; 
+                int  token_type;    
+                int value; /*  for save the value of the symbol  */
+            };
+
+        Added LEFT_ID to identify the left side of the assignment.
+
+            #define LEFT_ID 261 /*  token_type for left side identifiers  */
+
+
+    parser.c -->
+        Added the code to detect the LEFT_ID and send to emitter.C
+            void assignment() {
+                if (lookahead == ID) {
+                    int id_number = token_value;
+                    lookahead = LEFT_ID; 
+                    match(LEFT_ID);
+                    emit(LEFT_ID, id_number);
+                    match('=');
+                    expr();
+                    emit('=', id_number);
+                } else {
+                    error("syntax error in assignment");
+                }
+            }
+
+
+    emitter.c -->
+        Added an stack of int to calculate, evaluate and save the valors in symbol table.
+        Added the logic to allow the calulations for each symbol.
+
+    init.c --> 
+        Added a bucle to initialize the symtable[i].value = NONE. (-1)
+
+
+
+Part D:
+        new grammar:
+            start -> list eof
+
+            list -> assignment ; list
+                    | empty
+
+            assignment -> id { print(id.lexeme) } = expr { print('=') }
+
+            expr -> term moreterms
+
+            moreterms -> + term { print('+') } moreterms
+                    | - term { print('-') } moreterms
+                    | empty
+
+            term -> power morefactors
+
+            morefactors -> * power { print('*') } morefactors
+                    | / power { print('/') } morefactors
+                    | div power { print('DIV') } morefactors
+                    | mod power { print('MOD') } morefactors
+                    | empty
+
+            power -> factor morepowers
+
+            morepowers -> ^ factor {print('^')} morepowers
+                    | empty
+
+            factor -> ( expr )
+                    | id { print(id.lexeme) }
+                    | num { print(num.value) }
+
+        I added the corresponding functions to parser.c and emitter.c to make the grammar work correctly and generate the expected results.
+        I changed too some funcionts to call power() instead of factor()
+
+
+Finally, I used ChatGPT as a support tool to better understand some parts of the code that I did not fully understand 
+and to help me write the results section in a clearer way. It also gave me some implementation ideas that I used to 
+understand and modify the final code.
+
+- Rafael Pino Rodriguez.
