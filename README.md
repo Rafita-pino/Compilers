@@ -5,7 +5,7 @@ This repository contains a collection of projects developed for the **Compilers*
 The project covers the complete lifecycle of compiler design—from lexical analysis and manual parsing to automated generators and the implementation of a recursive execution engine for a custom language.
 
 ## 👤 Author
-* **Rafael Pino Rodriguez**
+* **Rafael Pino Rodríguez** · [LinkedIn](https://www.linkedin.com/in/rafael-pino-rodr%C3%ADguez-472918211)
 
 ## 🛠️ Technologies & Tools
 * **Languages:** C, C++
@@ -54,16 +54,19 @@ Each assignment includes its own `Makefile`. To compile and run the final versio
 cd assignment6/29
 make
 ./infix2postfix
+```
 
-````
 ---
-## Example program:
-```example
+
+## Example program
+
+```text
 read(i);
-while (i>0){
-if((i mod 100) < 1){}else{
-print(i);
-}
-i = i - 1;
+while (i > 0) {
+    if ((i mod 100) < 1) {} else {
+        print(i);
+    }
+    i = i - 1;
 }
 done
+```

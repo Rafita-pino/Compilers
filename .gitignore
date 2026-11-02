@@ -1,42 +1,31 @@
-# Compiled binaries
+# Build artifacts
+*.o
+*.obj
+*.gch
 *.out
 *.exe
 *.app
+/build/
+/bin/
 
-
-# Object files
-*.oode/
-.idea/
-*.swp
-*.swo
-
-
-# OS files
-.DS_Store
-Thumbs.db
-
-
-# Logs
-*.log
-
-
-# Temporary files
-*.tmp
-*.temp
-*.obj
-
-
-# Bison/Flex generated files
+# Bison / Flex generated files
 lex.yy.c
 y.tab.c
 y.tab.h
 *.tab.c
 *.tab.h
 
-# Build folders
-/build/
-/bin/
+# IDE / editor files
+.vscode/
+.idea/
+*.swp
+*.swo
 
+# OS files
+.DS_Store
+Thumbs.db
 
-# IDE / Editor files
-.vsc
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
